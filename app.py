@@ -4,16 +4,17 @@ import dash_html_components as html
 from dash.dependencies import Output, Input, State
 import pandas as pd
 
-data = pd.read_csv('BizOps_Set2.csv')
+data1 = pd.read_csv('BizOps_Set1.csv')
+data2 = pd.read_csv('BizOps_Set2.csv')
+
+combined = pd.merge(left=data1, right=data2, left_on = 'org_account_id', right_on='org_account_id')
 
 map_ = {'CHARGE': 'Revenue',
       'CREDIT': 'Credit'}
-data.transaction_type = data.transaction_type.map(map_)
+combined.transaction_type = combined.transaction_type.map(map_)
 
-to_drop = data[data.transaction_type.isnull()==True].index
-data.drop(to_drop, inplace=True)
-
-print(data.head)
+to_drop = combined[combined.transaction_type.isnull()==True].index
+combined.drop(to_drop, inplace=True)
 
 
 
@@ -25,7 +26,11 @@ app.layout = html.Div([
 
                 ),
         html.Div(children="Revenue Decompisition"
-                 )],
+                 ),
+        dcc.Dropdown(
+            options= [{'label': org, 'value': org} for org in combined.org_account_name.unique()],
+            multi= True
+        )],
     )
 ])
 
