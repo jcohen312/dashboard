@@ -25,13 +25,25 @@ app.layout = html.Div([
         html.H1(children="Vestwell Dashboard"
 
                 ),
+
         html.Div(children="Revenue Decompisition"
                  ),
+
         dcc.Dropdown(
             options= [{'label': org, 'value': org} for org in combined.org_account_name.unique()],
             multi= True
-        )],
-    )
+        ),
+
+        dcc.RadioItems(
+            options = [{'label': 'Revenue', 'value': 'Revenue'},
+                       {'label': 'Credit', 'value': 'Credit'},
+                       {'label': 'Net Revenue', 'value': 'Net Revenue'},
+                       ],
+            value = 'Net Revenue'
+
+        ),
+    ]),
+
 ])
 
 if __name__ == '__main__':
