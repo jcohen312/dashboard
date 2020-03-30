@@ -5,21 +5,29 @@ from dash import Dash
 from dash.dependencies import Output, Input, State
 import pandas as pd
 
+# Read in data
 data1 = pd.read_csv('BizOps_Set1.csv')
 data2 = pd.read_csv('BizOps_Set2.csv')
 
+# Merge dataframes so that have org names and info for each transaction
 combined = pd.merge(left=data1, right=data2, left_on = 'org_account_id', right_on='org_account_id')
 
+# Change labels in transaction_type column by creating map and applying to combined
 map_ = {'CHARGE': 'Revenue',
       'CREDIT': 'Credit'}
 combined.transaction_type = combined.transaction_type.map(map_)
 
+# Drop rows with partial credits
 to_drop = combined[combined.transaction_type.isnull()==True].index
 combined.drop(to_drop, inplace=True)
+# Set transaction dates as index
 combined.index = pd.to_datetime(combined.transction_date)
 
+# Group transactions by organization, transaction type, and month
+grouped = combined.groupby(by=['org_account_name','transaction_type',pd.Grouper(freq='M'), ]).agg('sum')['amount']
 
 
+# Create dash app
 app = dash.Dash(__name__)
 
 app.layout = html.Div([
