@@ -15,6 +15,7 @@ combined.transaction_type = combined.transaction_type.map(map_)
 
 to_drop = combined[combined.transaction_type.isnull()==True].index
 combined.drop(to_drop, inplace=True)
+combined.index = pd.to_datetime(combined.transction_date)
 
 
 
@@ -30,11 +31,13 @@ app.layout = html.Div([
                  ),
 
         dcc.Dropdown(
+            id = 'org dropdown',
             options= [{'label': org, 'value': org} for org in combined.org_account_name.unique()],
             multi= True
         ),
 
         dcc.RadioItems(
+            id = 'transaction selector',
             options = [{'label': 'Revenue', 'value': 'Revenue'},
                        {'label': 'Credit', 'value': 'Credit'},
                        {'label': 'Net Revenue', 'value': 'Net Revenue'},
@@ -42,9 +45,23 @@ app.layout = html.Div([
             value = 'Net Revenue'
 
         ),
+
+        dcc.Graph(
+            id = 'rev graph'
+        ),
     ]),
 
 ])
+
+@app.callback(
+    Output('rev graph', 'figure'),
+    [Input('org dropdown', 'value'),
+     Input('transaction selector', 'value')]
+
+)
+
+def update_chart(org_name, transaction='Net Revenue')
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
