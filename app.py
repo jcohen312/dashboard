@@ -37,16 +37,22 @@ app = dash.Dash(__name__)
 
 app.layout = html.Div([
     html.Div([
-        html.H1(children="Vestwell Dashboard",
+        html.H1(children="Example Dashboard",
                 style={'font': style['font'],
                        'color':'#FFFFFF',
-                       'backgroundColor': style['background']}
+                       'backgroundColor': style['background'],
+                       'textAlign':'center',
+                       'margin': 0}
 
                 ),
 
         html.Div(children="Revenue Decompisition",
                 style={'font': style['font'],
-                       'color':style['background']}
+                       'color':style['background'],
+                        'backgroundColor': style['button'],
+                       'fontSize': 22,
+                       'textAlign': 'center'
+                       }
                  ),
 
         dcc.Dropdown(
