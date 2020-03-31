@@ -4,6 +4,7 @@ import dash_html_components as html
 from dash import Dash
 from dash.dependencies import Output, Input, State
 import pandas as pd
+import plotly.graph_objs as go
 
 # Read in data
 data1 = pd.read_csv('BizOps_Set1.csv')
@@ -27,22 +28,31 @@ combined.index = pd.to_datetime(combined.transction_date)
 grouped = combined.groupby(by=['org_account_name','transaction_type',pd.Grouper(freq='M'), ]).agg('sum')['amount']
 
 
+style = {'background': '#033952',
+         'button': '#ddc04a',
+         'font': "nimbus-sans"}
+
 # Create dash app
 app = dash.Dash(__name__)
 
 app.layout = html.Div([
     html.Div([
-        html.H1(children="Vestwell Dashboard"
+        html.H1(children="Vestwell Dashboard",
+                style={'font': style['font'],
+                       'color':'#FFFFFF',
+                       'backgroundColor': style['background']}
 
                 ),
 
-        html.Div(children="Revenue Decompisition"
+        html.Div(children="Revenue Decompisition",
+                style={'font': style['font'],
+                       'color':style['background']}
                  ),
 
         dcc.Dropdown(
             id = 'org dropdown',
             options= [{'label': org, 'value': org} for org in combined.org_account_name.unique()],
-            multi= True
+            multi= True,
         ),
 
         dcc.RadioItems(
@@ -62,11 +72,26 @@ app.layout = html.Div([
 
 ])
 
-@app.callback(Output('rev graph', 'value'),
+@app.callback(Output('rev graph', 'figure'),
               [Input('org dropdown', 'value'),
                Input('transaction selector', 'value')])
 
-def
+def plot_org (orgs=[], transaction_type = 'Net Revenue'):
+    if transaction_type == 'Net Revenue':
+        data = [(go.Bar(x= grouped[org]['Revenue'].subtract(grouped[org]['Credit'], fill_value=0).index,
+                        y= grouped[org]['Revenue'].subtract(grouped[org]['Credit'], fill_value=0).values,
+                        name=org)) for org in orgs]
+    else:
+        data = [(go.Bar(x= grouped[org][transaction_type].index,
+             y= grouped[org][transaction_type].values,
+            name=org)) for org in orgs]
+
+    layout = go.Layout(title=', '.join(orgs)+' {}'.format(transaction_type),
+                  xaxis={'tickangle':45, 'tickvals':grouped[orgs[0]]['Revenue'].subtract(grouped[orgs[0]]['Credit'], fill_value=0).index })
+
+    fig = go.Figure(data=data, layout=layout)
+
+    return fig
 
 
 if __name__ == '__main__':
