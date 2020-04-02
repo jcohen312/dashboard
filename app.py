@@ -74,9 +74,22 @@ app.layout = html.Div([
         dcc.Graph(
             id = 'rev graph'
         ),
-    ]),
+    ],
+),
+    html.Div([
+        html.Div(children="Industry Decompisition",
+                style={'font': style['font'],
+                       'color':style['background'],
+                        'backgroundColor': style['button'],
+                       'fontSize': 22,
+                       'textAlign': 'center'
+                       }
+                 ),
+
+    ])
 
 ])
+
 
 @app.callback(Output('rev graph', 'figure'),
               [Input('org dropdown', 'value'),
